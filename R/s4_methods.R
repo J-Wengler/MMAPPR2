@@ -174,6 +174,7 @@ MmapprParam <- function(wtFiles,
 
     validity <- .validMmapprParam(param)
     if (typeof(validity) == "logical") {
+      print("Success: MmapprParam") #debug
       return(param)
     }
     else {
@@ -199,7 +200,6 @@ MmapprParam <- function(wtFiles,
     errors <- .validityErrors(.validBamFiles, wtFiles(param), errors)
     errors <- .validityErrors(.validBamFiles, mutFiles(param), errors)
     errors <- .validityErrors(.validVepFlags, vepFlags(param), errors)
-
 
     if (length(errors) == 0) TRUE else errors
 }
@@ -235,6 +235,7 @@ MmapprParam <- function(wtFiles,
         return(paste0("VEPFlags format flag must be 'vcf'\n",
                       "  e.g., flags(vepFlags)$format <- 'vcf'"))
     }
+    print("Success: .validVepFlags") #debug
     return(TRUE)
 }
 

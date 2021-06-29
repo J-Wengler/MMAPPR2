@@ -33,16 +33,18 @@ peakRefinement <- function(mmapprData){
         bplapply(mmapprData@peaks,
                  .peakRefinementChr,
                  mmapprData = mmapprData)
+    print("Success: peakRefinement")
     return(mmapprData)
 }
 
 .getSubsampleLoessMax <- function(rawData, loessSpan) {
-    tempData <- rawData[sample(seq_len(nrow(rawData)), 
+    tempData <- rawData[sample(seq_len(nrow(rawData)),
                                size = nrow(rawData)*.5),]
     tempData <- tempData[order(tempData$pos),]
     loessData <- suppressWarnings(
         loess(euclideanDistance~pos, data = tempData,
               span = loessSpan, family = c("symmetric")))
+    print("Success: .getSubsampleLoessMax")
     return(loessData$x[which.max(loessData$fitted)])
 }
 
@@ -54,46 +56,46 @@ peakRefinement <- function(mmapprData){
     names(data) <- c('x', 'y')
     # this arrange part is slow.
     data <- dplyr::arrange(data, dplyr::desc(data$y))
-
+    
     rollingSum <- cumsum(data$y)
     cutoffValue <- data$y[rollingSum >= topP][1]
-
+    
     data <- dplyr::filter(data, data$y >= cutoffValue)
-
+    
     minPos = min(data$x)
     maxPos = max(data$x)
     peakPos <- data$x[which.max(data$y)]
-
+    print("Success: .getPeakFromTopP")
     return(list(minPos = minPos, maxPos = maxPos, peakPos = peakPos))
 }
 
 .peakRefinementChr <- function(inputList, mmapprData) {
     stopifnot('seqname' %in% names(inputList))
     seqname <- inputList$seqname
-
-
+    
+    
     loessSpan <- mmapprData@snpDistance[[seqname]]$loess$pars$span
     pos <- mmapprData@snpDistance[[seqname]]$loess$x
     euclideanDistance <- mmapprData@snpDistance[[seqname]]$loess$y
     rawData <- data.frame(pos, euclideanDistance)
-
+    
     # get peak values of loess fits of 1000 subsamples
     maxValues <- replicate(1000, .getSubsampleLoessMax(rawData = rawData,
                                                        loessSpan = loessSpan))
-
+    
     densityData <- density.default(maxValues)
     densityFunction <- approxfun(x = densityData$x, y = densityData$y)
-
+    
     xMin <- min(densityData$x)
     xMax <- max(densityData$x)
-
+    
     densityRank <- data.frame(seq(xMin, xMax))
     names(densityRank) <- "pos"
     densityRank <- dplyr::mutate(densityRank,
-                      'densityValue' = densityFunction(seq(xMin,xMax)))
-
+                                 'densityValue' = densityFunction(seq(xMin,xMax)))
+    
     peak <- .getPeakFromTopP(densityRank, mmapprData@param@peakIntervalWidth)
-
+    
     outputList <- list()
     outputList$seqname <- seqname
     outputList$start <- peak$minPos
@@ -101,7 +103,7 @@ peakRefinement <- function(mmapprData){
     outputList$densityFunction <- densityFunction
     outputList$peakPosition <- peak$peakPos
     outputList$densityData <- densityData
-
+    print("Success: .peakRefinementChr")
     return(outputList)
 }
 
@@ -153,21 +155,21 @@ peakRefinement <- function(mmapprData){
 #' }
 prePeak <- function(mmapprData) {
     mmapprData@peaks <- list()
-
+    
     #need to calculate standard dev of all chromosomes for cutoff
     combinedStDev <- vapply(mmapprData@snpDistance, .stDevForChr, numeric(1))
     combinedStDev <- sum(combinedStDev)^(1/2)
-
+    
     distancemean <- vapply(mmapprData@snpDistance, .meanForChr, numeric(1))
     # mean of list of chr means
     distancemean <- mean(distancemean, na.rm = TRUE)
     cutoff <- 3*combinedStDev + distancemean
-
+    
     #get which peaks have values above cutoff, initialize them in mmapprData
     for(i in seq_along(mmapprData@snpDistance)){
         if(!is(mmapprData@snpDistance[[i]], 'list')) next
         if(!is(mmapprData@snpDistance[[i]]$loess, 'loess')) next
-
+        
         loessForChr <- mmapprData@snpDistance[[i]]$loess
         if (length(loessForChr$x) < 50) next
         containsPeak <- any(loessForChr$fitted > cutoff)
@@ -176,6 +178,7 @@ prePeak <- function(mmapprData) {
             mmapprData@peaks[[chrName]] <- list(seqname = chrName)
         }
     }
-
+    
+    print("Success: prePeak")
     return(mmapprData)
 }

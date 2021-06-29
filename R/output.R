@@ -49,6 +49,7 @@ outputMmapprData <- function(mmapprData) {
     .writeCandidateTables(mmapprData@candidates,
                           outputFolder(param(mmapprData)))
   }
+  print("Success: outputMmapprData") #debug
   invisible(1)
 }
 
@@ -158,7 +159,7 @@ tempOutputFolder <- function() {
   mtext(substitute("ED"^p~ ~"(Loess fit)", 
                    list(p = mmapprData@param@distancePower)),
         side = 2, line = 2)
-  
+  print("Success: .plotGenomeDistance") #debug
   if (savePdf) dev.off()
 }
 
@@ -225,6 +226,7 @@ tempOutputFolder <- function() {
             side = 2, line = 2)
     }
   }
+  print("Success: .plotPeaks") #debug
   dev.off()
 }
 

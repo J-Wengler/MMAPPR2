@@ -37,6 +37,7 @@ loessFit <- function(mmapprData) {
                  loessOptResolution = loessOptResolution,
                  loessOptCutFactor = loessOptCutFactor)
 
+    print("Success: loessFit") #debug
     return(mmapprData)
 }
 
@@ -44,6 +45,8 @@ loessFit <- function(mmapprData) {
 .getLoess <- function(s, pos, eucDist, ...){
     x <- suppressWarnings(try(loess(eucDist ~ pos, span = s, degree = 1,
                    family = "symmetric"), silent = TRUE))
+    
+    print("Success: .getLoess") #debug
     return(x)
 }
 
@@ -60,6 +63,7 @@ loessFit <- function(mmapprData) {
 
     result <- max(c(diff(spans)[index-1], diff(spans)[index]), na.rm = TRUE)
     stopifnot(is.numeric(result))
+    print("Success: localResolution") #debug
     return(result)
 }
 
@@ -98,6 +102,8 @@ loessFit <- function(mmapprData) {
                                              cutFactor = cutFactor))
         }
     }
+    
+    print("Success: .aiccOpt") #debug
     return(aiccDf)
 }
 
@@ -106,8 +112,9 @@ loessFit <- function(mmapprData) {
 .minTwo <- function(x){
     len <- length(x)
     if(len < 2){
+        print("Success: .minTwo") #debug
         return(x)
-    }
+            }
     sort(x,partial = c(1, 2))[c(1, 2)]
 }
 
@@ -115,6 +122,7 @@ loessFit <- function(mmapprData) {
 #returns all local minima (problem if repeated local maxima on end)
 .localMin <- function(x){
     indices <- which(diff(c(FALSE,diff(x)>0,TRUE))>0)
+    print("Success: .localMin") #debug
     return(x[indices])
 }
 
@@ -137,6 +145,7 @@ loessFit <- function(mmapprData) {
     traceL <- x$trace.hat
     sigma2 <- sum( x$residuals^2 ) / (n-1)
     #return aicc value
+    print("Success: .aicc") #debug
     return(log(sigma2) + 1 + 2* (2*(traceL+1)) / (n-traceL-2))
 }
 
@@ -174,6 +183,7 @@ loessFit <- function(mmapprData) {
         resultList$seqname <- NULL
 
         resultList$loessTime <- proc.time() - startTime
+        print("Success: .loessFitForChr") #debug
         return(resultList)
     },
     error = function(e) {

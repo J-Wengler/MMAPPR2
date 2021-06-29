@@ -28,6 +28,6 @@
   pData[, CVG := A.FREQ + C.FREQ + G.FREQ + T.FREQ
       ][, c("A.FREQ", "C.FREQ", "G.FREQ", "T.FREQ") := 
           list(A.FREQ/CVG, C.FREQ/CVG, G.FREQ/CVG, T.FREQ/CVG)]
-
+  print("Success: .getPileup") #debug
   return(pData)
 }

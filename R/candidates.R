@@ -60,6 +60,8 @@ generateCandidates <- function(mmapprData) {
                                   FUN=.scoreVariants,
                                   mmapprData@peaks)
   
+  print("Success: generateCandidates") #debug
+  
   return(mmapprData)
 }
 
@@ -71,6 +73,7 @@ generateCandidates <- function(mmapprData) {
   
   gr <- GRanges(seqnames=names(ir),
                 ranges=ir)
+  print("Success: .getPeakRange") #debug
   return(gr)
 }
 
@@ -100,9 +103,13 @@ generateCandidates <- function(mmapprData) {
       paste0(names(param@mutFiles),
              collapse = " -- ")
     S4Vectors::mcols(resultVr) <- NULL
+    print("Success: .getVariantsForRange") #debug
     return(resultVr)
   }
-  else return(NULL)
+  else {    #originally return(null) on same line
+    print(".getVariantsForRange returned NULL") #debug
+    return(NULL)
+  }
 }
 
 
@@ -122,6 +129,7 @@ generateCandidates <- function(mmapprData) {
     # if (file.exists(vcf)) file.remove(vcf)
   })
   
+  print("Success: .runVEPForVariants") #debug
   return(resultGRanges)
 }
 
@@ -130,6 +138,7 @@ generateCandidates <- function(mmapprData) {
   impactLevels <- c("HIGH", "MODERATE", "LOW", "MODIFIER")
   filter <- mcols(candidateGRanges)$IMPACT %in% impactLevels[1:impact]
   filter[is.na(filter)] <- TRUE
+  print("Success: .filterVariants") #debug
   return(candidateGRanges[filter])
 }
 
@@ -161,6 +170,7 @@ generateCandidates <- function(mmapprData) {
   mcols(genes) <- cbind(mcols(genes), countDF)
   
   #filter for differentially expressed genes
+  print("Success: .addDiff") #debug
   return(genes[(abs(genes$log2FC) > 1 | is.na(genes$log2FC)) 
                & (genes$ave_wt > 10 | genes$ave_mt > 10)])
 }
@@ -181,12 +191,14 @@ generateCandidates <- function(mmapprData) {
     returnData[[seqname]] <-
       .orderVariants(candList[[seqname]], densityCol)
   }
+  print("Success: .scoreVariants") #debug
   return(returnData)
 }
 
 
 .orderVariants <- function(candidateGRanges, densityCol) {
   if(!(class(candidateGRanges) %in% c("VRanges", "GRanges"))) { 
+    print("Success: .orderVariants") #debug
     return(candidateGRanges)
   }
   if(!is.null(candidateGRanges$IMPACT)) {
@@ -197,6 +209,7 @@ generateCandidates <- function(mmapprData) {
     orderVec <- order(densityCol, decreasing=TRUE)
   }
   candidateGRanges <- candidateGRanges[orderVec]
+  print("Success: .orderVariants") #debug
   return(candidateGRanges)
 }
 

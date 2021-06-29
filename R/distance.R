@@ -34,6 +34,7 @@ calculateDistance <- function(mmapprData) {
   mmapprData@snpDistance <-
     bplapply(chrList, .calcDistForChr, param = mmapprData@param)
   
+  print("Success: calculateDistance") #debug
   return(mmapprData)
 }
 
@@ -116,6 +117,7 @@ calculateDistance <- function(mmapprData) {
     
     .messageAndLog(paste("Finished", seqnames(chrRange)[1]), 
                    outputFolder = outputFolder(param))
+    print("Success: .calcDistForChr") #debug
     return(resultList)
   },
   
@@ -147,7 +149,7 @@ calculateDistance <- function(mmapprData) {
                                        pruning.mode = 'coarse')
   genes <- dropSeqlevels(genes, 'MT',
                                        pruning.mode = 'coarse')
-  
+  print("Success: .getFileReadForChrList") #debug
   return(genes)
 })}
 
@@ -175,5 +177,6 @@ calculateDistance <- function(mmapprData) {
                        AVE.T.FREQ = mean(T.FREQ)), 
                      .(CHROM, POS)]
   }
+  print("Success: .avgFiles") #debug
   return(chrDf)
 }

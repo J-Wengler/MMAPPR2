@@ -1,4 +1,4 @@
-Package: MMAPPR2
+Package: MMAPPR2Test
 Title: Mutation Mapping Analysis Pipeline for Pooled RNA-Seq
 Version: 0.99.24
 Authors@R: c(
