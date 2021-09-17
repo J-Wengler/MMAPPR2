@@ -32,18 +32,24 @@
 #' }
 
 generateCandidates <- function(mmapprData) {
+  
+  saveRDS(mmapprData, file="mmappr_data_1.RDS") #testing
   #get GRanges representation of peak
   peakGRanges <- lapply(mmapprData@peaks, .getPeakRange)
+  
+  saveRDS(peakGRanges, file="peakGranges.RDS") #testing
   
   #call variants in peak
   mmapprData@candidates$snps <- lapply(peakGRanges,
                                        FUN=.getVariantsForRange,
                                        param=mmapprData@param)
+  saveRDS(mmapprData, file="mmappr_data_2.RDS") #testing
   
   #run VEP
   mmapprData@candidates$effects <- lapply(mmapprData@candidates$snps,
                                           FUN=.runVEPForVariants,
                                           param=mmapprData@param)
+  saveRDS(mmapprData, file="mmappr_data_3.RDS") #testing
   
   #filter out low impact effects
   mmapprData@candidates$effects <- lapply(mmapprData@candidates$effects, 
@@ -108,7 +114,8 @@ generateCandidates <- function(mmapprData) {
   }
   else {    #originally return(null) on same line
     print(".getVariantsForRange returned NULL") #debug
-    return(NULL)
+    #return(NULL)
+    return()
   }
 }
 
@@ -116,7 +123,9 @@ generateCandidates <- function(mmapprData) {
 .runVEPForVariants <- function(inputVariants, param){
   vepFlags <- vepFlags(param)
   stopifnot(is(vepFlags, "VEPFlags"))
-  stopifnot(is(inputVariants, 'VRanges'))
+  #stopifnot(is(inputVariants, 'VRanges'))
+  #check that there are variants
+  if(!length(inputVariants) == 0) {
   
   vcf <- file.path(outputFolder(param), paste0(seqnames(inputVariants)[1], 'peak.vcf'))
 
@@ -131,6 +140,8 @@ generateCandidates <- function(mmapprData) {
   
   print("Success: .runVEPForVariants") #debug
   return(resultGRanges)
+  }
+  print("No variants")
 }
 
 
