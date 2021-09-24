@@ -45,6 +45,20 @@ generateCandidates <- function(mmapprData) {
                                        param=mmapprData@param)
   saveRDS(mmapprData, file="mmappr_data_2.RDS") #testing
   
+  #remove NULL values from snps
+  allPeaks <- length(mmapprData@candidates$snps)
+  mmapprData@candidates$snps <- mmapprData@candidates$snps[!sapply(mmapprData@candidates$snps,is.null)]
+  noNullPeaks <- length(mmapprData@candidates$snps)
+  
+  if(allPeaks != noNullPeaks) {
+    peaksRemoved <- allPeaks - noNullPeaks
+    print("Warning: peaks without valid snps were called but then removed")
+    print(paste("Number of peaks removed:" , peaksRemoved))
+  }
+  
+  #add peak removal
+  
+  
   #run VEP
   mmapprData@candidates$effects <- lapply(mmapprData@candidates$snps,
                                           FUN=.runVEPForVariants,
