@@ -52,11 +52,10 @@ generateCandidates <- function(mmapprData) {
   
   if(allPeaks != noNullPeaks) {
     peaksRemoved <- allPeaks - noNullPeaks
-    print("Warning: peaks without valid snps were called but then removed")
-    print(paste("Number of peaks removed:" , peaksRemoved))
+    .messageAndLog("Warning: peaks without valid snps were called but then removed", oF)
+    .messageAndLog(paste("Number of peaks removed:" , peaksRemoved), oF)
   }
   
-  #add peak removal
   
   
   #run VEP

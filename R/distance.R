@@ -54,10 +54,11 @@ calculateDistance <- function(mmapprData) {
 .calcDistForChr <- function(chrRange, param){
   tryCatch({
     #parameter check
+    print("Start: .calcDistForChr")
     stopifnot(length(unique(seqnames(chrRange))) == 1)
     stopifnot(is(param, "MmapprParam"))
-    
     stopifnot(!is.null(chrRange))
+    print("passed stop if not .calcDistForChr")
     
     #apply functions to wild type pool
     #CAUTION: functions must be applied in this order to work right
@@ -68,6 +69,7 @@ calculateDistance <- function(mmapprData) {
       pileupWT <- .avgFiles(pileupWT, 
                             fileAggregation = fileAggregation(param)[1]) # Average files
       pileupWT <- pileupWT[AVE.CVG > param@minDepth]
+      print("end: pileupWT")
       
     }, error = function(e) {
       msg <- 'Insufficient data in wild-type file(s)'
@@ -83,7 +85,7 @@ calculateDistance <- function(mmapprData) {
       pileupMut <- .avgFiles(pileupMut, 
                              fileAggregation = fileAggregation(param)[1])
       pileupMut <- pileupMut[AVE.CVG > param@minDepth]
-      
+      print("end pileupMut")
     }, error = function(e) {
       msg <- 'Insufficient data in mutant file(s)'
       stop(msg)
@@ -94,6 +96,7 @@ calculateDistance <- function(mmapprData) {
     setkey(pileupWT, CHROM, POS)
     setkey(pileupMut, CHROM, POS)
     distanceDf <- merge(pileupWT, pileupMut, suffixes = c(".WT", ".MT"))
+    print("innerjoin success")
     
     if (length(distanceDf) == 0)
       stop('Empty dataframe after joining WT and Mut count tables')
@@ -104,12 +107,13 @@ calculateDistance <- function(mmapprData) {
                                   (AVE.G.FREQ.WT - AVE.G.FREQ.MT)^2 +
                                   (AVE.T.FREQ.WT - AVE.T.FREQ.MT)^2) ^
                                   distancePower(param)]
-    
+    print("success calc euclid")
     #filter out uninformative snps (both homozygous and identical)
     homozygousWT <- apply(distanceDf[, AVE.A.FREQ.WT:AVE.T.FREQ.WT], 1, max) 
     homozygousWT <- homozygousWT > homozygoteCutoff(param)
     distanceDf <- distanceDf[!(homozygousWT)]
     
+    print("success filter out uninformative")
     stopifnot(nrow(distanceDf) > 0)
     
     resultList <- list(wtCounts = pileupWT, mutCounts = pileupMut,
