@@ -99,28 +99,42 @@ generateCandidates <- function(mmapprData) {
 
 .getVariantsForRange <- function(inputRange, param) {
   # merge files in desired region if there are multiple
+  print("Start getVariantsForRange")
   mergedBam <- file.path(outputFolder(param), 'merged.tmp.bam')
-  if (length(param@mutFiles) < 2) mutBam <- param@mutFiles[[1]]
-  else{
+  print("mergedBam")
+  if (length(param@mutFiles) < 2) {
+    print("length less than 2")
+    mutBam <- param@mutFiles[[1]]
+    print("got mutBam")
+  }else{
     mutBam <- mergeBam(param@mutFiles,
                        destination=mergedBam,
                        region=inputRange)
+    print("mergedBam")
   }
   
   # create param for variant calling
+  print("Creating tallyParam")
   tallyParam <- TallyVariantsParam(genome=param@refGenome,
                                    which=inputRange,
                                    indels=TRUE)
+  print("tallyParam created")
   
   resultVr <- callVariants(mutBam, tally.param=tallyParam)
+  print("callVariants complete")
   resultVr <- resultVr[altDepth(resultVr)/totalDepth(resultVr) > 0.8]
+  print("filtered variants >.8")
   if (file.exists(mergedBam)) file.remove(mergedBam)
   
+  print("removed Bam")
   if (length(resultVr) > 0) {
     # need sampleNames to convert to VCF; using mutant file names
+    print("length resultVr > 0")
     Biobase::sampleNames(resultVr) <-
       paste0(names(param@mutFiles),
              collapse = " -- ")
+    
+    print("samplenames done")
     S4Vectors::mcols(resultVr) <- NULL
     print("Success: .getVariantsForRange") #debug
     return(resultVr)
