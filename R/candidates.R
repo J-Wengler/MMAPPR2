@@ -115,6 +115,7 @@ generateCandidates <- function(mmapprData) {
   
   # create param for variant calling
   print("Creating tallyParam")
+  print(inputRange)
   tallyParam <- TallyVariantsParam(genome=param@refGenome,
                                    which=inputRange,
                                    indels=TRUE)
