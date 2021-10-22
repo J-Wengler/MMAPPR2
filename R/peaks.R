@@ -63,6 +63,9 @@ peakRefinement <- function(mmapprData){
     data <- dplyr::filter(data, data$y >= cutoffValue)
     
     minPos = min(data$x)
+    
+    #added this line to stop error where negative indices were reported for peaks. 
+    minPos[minPos<0] <- 0
     maxPos = max(data$x)
     peakPos <- data$x[which.max(data$y)]
     print("Success: .getPeakFromTopP")
