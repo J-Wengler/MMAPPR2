@@ -44,7 +44,6 @@ peakRefinement <- function(mmapprData){
     loessData <- suppressWarnings(
         loess(euclideanDistance~pos, data = tempData,
               span = loessSpan, family = c("symmetric")))
-    print("Success: .getSubsampleLoessMax")
     return(loessData$x[which.max(loessData$fitted)])
 }
 
@@ -66,9 +65,9 @@ peakRefinement <- function(mmapprData){
     
     #added this line to stop error where negative indices were reported for peaks. 
     minPos[minPos<0] <- 0
+    
     maxPos = max(data$x)
     peakPos <- data$x[which.max(data$y)]
-    print("Success: .getPeakFromTopP")
     return(list(minPos = minPos, maxPos = maxPos, peakPos = peakPos))
 }
 
@@ -106,7 +105,6 @@ peakRefinement <- function(mmapprData){
     outputList$densityFunction <- densityFunction
     outputList$peakPosition <- peak$peakPos
     outputList$densityData <- densityData
-    print("Success: .peakRefinementChr")
     return(outputList)
 }
 

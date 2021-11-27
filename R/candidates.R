@@ -32,18 +32,13 @@
 #' }
 
 generateCandidates <- function(mmapprData) {
-  
-  saveRDS(mmapprData, file="mmappr_data_1.RDS") #testing
   #get GRanges representation of peak
   peakGRanges <- lapply(mmapprData@peaks, .getPeakRange)
-  
-  saveRDS(peakGRanges, file="peakGranges.RDS") #testing
   
   #call variants in peak
   mmapprData@candidates$snps <- lapply(peakGRanges,
                                        FUN=.getVariantsForRange,
                                        param=mmapprData@param)
-  saveRDS(mmapprData, file="mmappr_data_2.RDS") #testing
   
   #remove NULL values from snps
   allPeaks <- length(mmapprData@candidates$snps)
@@ -62,7 +57,6 @@ generateCandidates <- function(mmapprData) {
   mmapprData@candidates$effects <- lapply(mmapprData@candidates$snps,
                                           FUN=.runVEPForVariants,
                                           param=mmapprData@param)
-  saveRDS(mmapprData, file="mmappr_data_3.RDS") #testing
   
   #filter out low impact effects
   mmapprData@candidates$effects <- lapply(mmapprData@candidates$effects, 
